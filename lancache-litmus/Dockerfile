@@ -1,4 +1,4 @@
-FROM lancachenet/ubuntu-nginx:latest
+FROM lancachenet/ubuntu-nginx:latest AS final
 MAINTAINER LanCache.Net Team <team@lancache.net>
 
 ENV WEBUSER www-data
@@ -25,3 +25,13 @@ VOLUME ["/var/www/litmus"]
 EXPOSE 80
 
 WORKDIR /scripts
+
+FROM final AS build-sites-js
+
+# Generate a sites.js
+RUN /bin/bash /hooks/entrypoint-pre.d/10_generate_litmus_statusjs.sh
+
+FROM final
+
+# Ship the generated sites.js
+COPY --from=build-sites-js /var/www/litmus/sites.js /var/www/litmus/sites.js
