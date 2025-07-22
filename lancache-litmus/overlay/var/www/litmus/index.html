@@ -1,208 +1,697 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>LanCache Host Checker</title>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-	<script src="sites.js"></script>
-	<script>
-		wildcardPrefix = "lancachetest."
-		function hideAlert() {
-			$("#cache-info").hide();
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LanCache Host Checker</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="sites.js"></script>
+    <style>
+        :root {
+            --primary-color: #E91D12;
+            --text-color: #FBEEE9;
+            --background-color: #28252C;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ff0000;
+            --white: #ffffff;
+            --light-gray: #f8fafc;
+            --gray: #64748b;
+            --dark-gray: #334155;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Header Section */
+        .header {
+            background: var(--background-color);
+            color: var(--text-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-hover);
+            border: 2px solid var(--primary-color);
+        }
+
+        .header img {
+            max-height: 80px;
+            margin-bottom: 1.5rem;
+            filter: brightness(0) invert(1);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .subtitle {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: 1.5rem;
+        }
+
+        .warning-banner {
+            background: rgba(233, 29, 18, 0.15);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            border: 1px solid rgba(233, 29, 18, 0.3);
+        }
+
+        .dns-info {
+            background: rgba(233, 29, 18, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(233, 29, 18, 0.2);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-button {
+            background: var(--primary-color);
+            color: var(--text-color);
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .info-button:hover {
+            background: transparent;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(233, 29, 18, 0.3);
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        /* Test Section */
+        .test-section {
+            background: var(--background-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--primary-color);
+        }
+
+        .test-section h2 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(233, 29, 18, 0.2);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        .btn-primary:hover {
+            background: #c41611;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Alert Section */
+        .alert {
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            position: relative;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-left-color: var(--success-color);
+            color: #166534;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border-left-color: var(--warning-color);
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            border-left-color: var(--danger-color);
+            color: #991b1b;
+        }
+
+        .alert .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.6;
+            color: inherit;
+        }
+
+        .alert .close:hover {
+            opacity: 1;
+        }
+
+        /* CDN Cards Grid */
+        .services-header {
+            margin: 2rem 0 1.5rem 0;
+            text-align: center;
+        }
+
+        .services-header h2 {
+            color: var(--text-color);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .services-header p {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .cdn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.3rem;
+        }
+
+        .cdn-card {
+			background: var(--background-color);
+			border-radius: 16px;
+			padding: 1.75rem;
+			box-shadow: var(--shadow);
+			border: 2px solid rgba(255,255,255,0.1);
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			transition: transform .3s, box-shadow .3s;
 		}
 
-		function displayCdnAlert(cdn) {
-			console.log(cdn, cachedomains[cdn]);
-			if (cachedomains[cdn].brokenDomains.length == 0) {
-				return hideAlert();
-			}
-			var newHTML = "";
-			for (var x in cachedomains[cdn].brokenDomains) {
-				newHTML += cachedomains[cdn].brokenDomains[x]+"<br>";
-			}
-			displayAlert("The following domains did not resolve to a LanCache instance:", newHTML);
-		}
-		function displayAlert(title, content, type="warning") {
-			$("#cache-info").removeClass("alert-warning").removeClass("alert-danger").removeClass("alert-success").addClass("alert-"+type);
-			$("#cache-info-display-title").html("<b>"+title+"</b><br>");
-			$("#cache-info-display").html(content);
-			$("#cache-info").show();
-		}
+        .cdn-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
 
-		function checkDomain(cdn, domainname) {
-			var re = /^\*\./g
-			var domainname = domainname.replace(re, wildcardPrefix);
-			return new Promise(function(resolve, reject) {
-				var handleResponse = function(xhr) {
-					if (xhr.host.indexOf(wildcardPrefix) > -1) {
-						xhr.host = xhr.host.replace(wildcardPrefix, "*.") + " (via "+xhr.host+")";
-					}
-					var ret = {
-						host: xhr.host,
-						status: 2,
-						cdn: cdn,
-						respondingHost: false,
-					};
-					if (xhr.status == 204) {
-						ret.respondingHost = xhr.getResponseHeader("X-LanCache-Processed-By");
-						ret.status = 1;
-						return resolve(ret);
-					}
-					ret.status = 0;
-					return resolve(ret);
-				}
-				$.ajax("http://" + domainname + "/lancache-heartbeat",
-				{
-					beforeSend: function(xhr, settings) {
-						xhr.host = settings.url.match(/^http:\/\/(.+?)\/.+/)[1];
-					},
-					success: function(data, textStatus, xhr){ 
-						handleResponse(xhr)
-					},
-					error: function(xhr){
-						handleResponse(xhr)
-					},
+        .cdn-card.status-success   { border-top: 6px solid var(--success-color); }
+		.cdn-card.status-warning   { border-top: 6px solid var(--warning-color); }
+		.cdn-card.status-danger    { border-top: 6px solid var(--danger-color); }
+		.cdn-card.status-loading   { border-top: 6px solid rgba(100,100,100,.5); }
 
-				})
-			})
-		}
+        .cdn-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
 
-		$(document).ready(function() {
-			hideAlert();
-			$("#inputTest").keydown(function(event) {
-				if (event.which == 13) {
-					$("#inputTestButton").click();
-				}
-			});
-			$("#inputTestButton").click(function() {
-				var url = $("#inputTest").val();
-				checkDomain(false, url).then(function(response) {
-					var alertType = "danger";
-					var alertTitle = "Test failed";
-					var alertText = url+" did not resolve to a LanCache instance";
-					if (response.status == 1) {
-						alertType = "success";
-						alertTitle = "Test Succeeded";
-						alertText = url+" resolves to a LanCache instance named "+response.respondingHost;
-					}
-					displayAlert(alertTitle, alertText, alertType)
-					console.log(response);
-				})
-			});
-			var cdntemplate = $("#cdntemplate");
-			var cdnElements = {};
-			var domaincount = 0;
-			var providercount = 0;
-			var callbacks = {};
-			var distinctCaches = [];
-			for (var cdn in cachedomains) {
-				callbacks[cdn] = [];
-				cachedomains[cdn].brokenDomains = [];
-				providercount++;
-				domaincount += cachedomains[cdn].domains.length;
-				cdnElements[cdn] = cdntemplate.clone().attr('id', 'cdn'+cdn).appendTo($("#cdns"));
-				$(cdnElements[cdn]).find("#title").html(cdn);
-				$(cdnElements[cdn]).find("#tagline").html(cachedomains[cdn].description);
-				$(cdnElements[cdn]).find("#totalcdndomaincount").html(cachedomains[cdn].domains.length);
-				$(cdnElements[cdn]).click(function() {
-					displayCdnAlert($(this).find("#title").html());
-				});
-				for (var domain in cachedomains[cdn].domains) {
-					callbacks[cdn].push(checkDomain(cdn, cachedomains[cdn].domains[domain]))
-				}
-				Promise.all(callbacks[cdn]).then(function(responses) {
-					var cdnname = this.find("#title").html();
-					var success = 0;
-					var fail = 0;
-					for (var x in responses) {
-						var response = responses[x];
-						if (response.status == 1) {
-							success++;
-							if (distinctCaches.indexOf(response.respondingHost) == -1) {
-								distinctCaches.push(response.respondingHost);
-							}
-						} else {
-							cachedomains[response.cdn].brokenDomains.push(response.host);
-							fail++;
-						}
-					}
-					var newstate = "alert-success";
-					if (fail > 0) {
-						newstate = "alert-warning";
-					}
-					if (success == 0) {
-						newstate = "alert-danger";
-					}
-					this.find(".item").removeClass("alert-info").addClass(newstate);
-					this.find("#workingcdndomaincount").html(success);
-				}.bind(cdnElements[cdn]));
-			}
-			$("#urltext").html(urltext)
-			$("#domaincount").html(domaincount)
-			$("#providercount").html(providercount)
-			cdntemplate.hide()
-		});
-	</script>
-	<style>
-		.container-fluid {
-			max-width: 95%;
-		}
-		.cdnentry {
-			padding: 5px;
-		}
-		.margin-fix {
-			margin-top: 5px;
-			margin-bottom: 0px;
-		}
-	</style>
+        .cdn-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin-right: 1rem;
+            background: rgba(233, 29, 18, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-color);
+            flex-shrink: 0;
+            border: 1px solid var(--primary-color);
+        }
+
+        .cdn-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-transform: capitalize;
+            line-height: 1.2;
+        }
+
+        .cdn-description {
+            color: var(--text-color);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+            line-height: 1.5;
+            opacity: 0.8;
+        }
+
+        .cdn-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--primary-color);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            position: relative;
+        }
+
+        .status-dot.success {
+            background: var(--success-color);
+        }
+
+        .status-dot.warning {
+            background: var(--warning-color);
+        }
+
+        .status-dot.danger {
+            background: var(--danger-color);
+        }
+
+        .status-dot.loading {
+            background: var(--gray);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.success::after {
+            content: '✓';
+            position: absolute;
+            top: -1px;
+            left: 2px;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .stats-text {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .working-count {
+            color: var(--text-color);
+        }
+
+        .working-count.success {
+            color: var(--success-color);
+        }
+
+        .working-count.warning {
+            color: var(--warning-color);
+        }
+
+        .working-count.danger {
+            color: var(--danger-color);
+        }
+
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1800px;
+                padding-left: 0.25rem;
+                padding-right: 0.25rem;
+            }
+
+            .cdn-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 2rem 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .button-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .cdn-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .cdn-card {
+                min-height: 160px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .cdn-card {
+                padding: 1.25rem;
+                min-height: 140px;
+            }
+
+            .cdn-logo {
+                width: 32px;
+                height: 32px;
+            }
+
+            .cdn-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-	<div class="container-fluid">
-		<div class="jumbotron margin-fix">
-			<div class="container">
-				<h1 class="display-4">Lancache Litmus Test</h1>
-				<p class="lead">We are aware of <b id="domaincount">0</b> domains spanning <b id="providercount">0</b> providers.</p>
-				<p id="urltext"></p>
-			</div>
-		</div>
-		<br>
-		<div id="cdns" class="row">
-			<div id="cdn-tester" class="cdnentry col-md-12">
-				<div class="item text-center border rounded alert alert-secondary">
-					<div class="form-group margin-fix">
-						<div class="col-sm-6 offset-sm-3">
-							<div class="input-group">
-								<input type="text" class="form-control rounded" id="inputTest" placeholder="Check domain (Wildcards valid)">
-								<span class="input-group-btn">
-									&nbsp;
-									<button id="inputTestButton" class="btn btn-primary mb-2">Test</button>
-							   </span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="cdnentry col-md-12">
-				<div id="cache-info" class="item text-center border rounded alert alert-warning">
-					<button type="button" class="close" aria-label="Close">
-						<span aria-hidden="true" onclick="hideAlert()">&times;</span>
-					</button>
-					<span id="cache-info-display-title">
-						<b>The following domains did not resolve to a LanCache:</b><br>
-					</span>
-					<span id="cache-info-display">
-					</span>
-				</div>
-			</div>
-			<div id="cdntemplate" class="cdnentry col-md-3">
-				<div class='item text-center border rounded alert-info'>
-					<b><span id="title">Nothing is defined?<br>I'm not sure how you've done this, but you have.</span></b><br>
-					<span id="tagline">So well done.</span><br>
-					<span id="workingcdndomaincount">0</span>/<span id="totalcdndomaincount">0</span> domains working
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <img src="https://lancache.net/img/lancache-fulllogo.svg" alt="Logo">
+            <h1>LanCache Test</h1>
+            <p class="subtitle">
+                We are aware of <strong id="domaincount">0</strong> domains spanning 
+                <strong id="providercount">0</strong> providers.
+            </p>
+            
+            <div class="warning-banner">
+                🦊 Test this website in the Mozilla Firefox browser if the site doesnt work at all
+            </div>
+            
+            <div class="dns-info">
+                <p style="margin-bottom: 1rem;">During LanCache Test if you find the listed Gaming Stream sites RED then your Cache Services are NOT working. Get started with LanCache today!</p>
+                
+                <div class="button-grid">
+                    <a href="https://lancache.net/" class="info-button" target="_blank" rel="noopener">
+                        🚀 Learn more about Lancache
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Section -->
+        <div class="test-section">
+            <h2>🔍 Test Custom Domain</h2>
+            <div class="input-group">
+                <input type="text" id="inputTest" placeholder="Enter domain to test (Wildcards valid - e.g., *.example.com)">
+                <button id="inputTestButton" class="btn btn-primary">Test Domain</button>
+            </div>
+        </div>
+
+        <!-- Alert Section -->
+        <div id="cache-info" class="alert alert-warning" style="display: none;">
+            <button type="button" class="close" onclick="hideAlert()">&times;</button>
+            <div id="cache-info-display-title"></div>
+            <div id="cache-info-display"></div>
+        </div>
+
+        <!-- Services Header -->
+        <div class="services-header">
+            <h2>🎮 Gaming & CDN Services</h2>
+            <p>Live status of supported gaming platforms and content delivery networks</p>
+        </div>
+
+        <!-- CDN Cards Grid -->
+        <div id="cdns" class="cdn-grid"></div>
+
+        <!-- Hidden Template -->
+        <div id="cdntemplate" style="display: none;">
+            <div class="cdn-card status-loading">
+                <div class="cdn-header">
+                    <div class="cdn-logo" id="logo">
+                        <span id="logo-fallback">?</span>
+                        <img id="logo-img" style="display: none;" onerror="this.style.display='none'; this.parentNode.querySelector('#logo-fallback').style.display='inline';">
+                    </div>
+                    <div class="cdn-title" id="title">Loading...</div>
+                </div>
+                <div class="cdn-description" id="tagline">Checking domains...</div>
+                <div class="cdn-footer">
+                    <div class="status-indicator">
+                        <div class="status-dot loading"></div>
+                        <span class="stats-text">
+                            <span class="working-count" id="workingcdndomaincount">0</span>/<span id="totalcdndomaincount">0</span> domains
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        wildcardPrefix = "lancachetest.";
+        
+        function hideAlert() {
+            $("#cache-info").hide();
+        }
+
+        function displayCdnAlert(cdn) {
+            console.log(cdn, cachedomains[cdn]);
+            if (cachedomains[cdn].brokenDomains.length == 0) {
+                return hideAlert();
+            }
+            var newHTML = "";
+            for (var x in cachedomains[cdn].brokenDomains) {
+                newHTML += cachedomains[cdn].brokenDomains[x] + "<br>";
+            }
+            displayAlert("The following domains did not resolve to a LanCache instance:", newHTML);
+        }
+        
+        function displayAlert(title, content, type = "warning") {
+            $("#cache-info").removeClass("alert-warning").removeClass("alert-danger").removeClass("alert-success").addClass("alert-" + type);
+            $("#cache-info-display-title").html("<strong>" + title + "</strong><br>");
+            $("#cache-info-display").html(content);
+            $("#cache-info").show();
+        }
+
+        function checkDomain(cdn, domainname) {
+            var re = /^\*\./g;
+            var domainname = domainname.replace(re, wildcardPrefix);
+            return new Promise(function(resolve, reject) {
+                var handleResponse = function(xhr) {
+                    if (xhr.host.indexOf(wildcardPrefix) > -1) {
+                        xhr.host = xhr.host.replace(wildcardPrefix, "*.") + " (via " + xhr.host + ")";
+                    }
+                    var ret = {
+                        host: xhr.host,
+                        status: 2,
+                        cdn: cdn,
+                        respondingHost: false,
+                    };
+                    if (xhr.status == 204) {
+                        ret.respondingHost = xhr.getResponseHeader("X-LanCache-Processed-By");
+                        ret.status = 1;
+                        return resolve(ret);
+                    }
+                    ret.status = 0;
+                    return resolve(ret);
+                };
+                $.ajax("//" + domainname + "/lancache-heartbeat", {
+                    beforeSend: function(xhr, settings) {
+                        xhr.host = settings.url.match(/^http:\/\/(.+?)\/.+/)[1];
+                    },
+                    success: function(data, textStatus, xhr) {
+                        handleResponse(xhr);
+                    },
+                    error: function(xhr) {
+                        handleResponse(xhr);
+                    },
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            hideAlert();
+            
+            $("#inputTest").keydown(function(event) {
+                if (event.which == 13) {
+                    $("#inputTestButton").click();
+                }
+            });
+            
+            $("#inputTestButton").click(function() {
+                var url = $("#inputTest").val();
+                checkDomain(false, url).then(function(response) {
+                    var alertType = "danger";
+                    var alertTitle = "❌ Test Failed";
+                    var alertText = url + " did not resolve to a LanCache instance";
+                    if (response.status == 1) {
+                        alertType = "success";
+                        alertTitle = "✅ Test Succeeded";
+                        alertText = url + " resolves to a LanCache instance named " + response.respondingHost;
+                    }
+                    displayAlert(alertTitle, alertText, alertType);
+                    console.log(response);
+                });
+            });
+            
+            var cdntemplate = $("#cdntemplate");
+            var cdnElements = {};
+            var domaincount = 0;
+            var providercount = 0;
+            var callbacks = {};
+            var distinctCaches = [];
+            
+            for (var cdn in cachedomains) {
+                callbacks[cdn] = [];
+                cachedomains[cdn].brokenDomains = [];
+                providercount++;
+                domaincount += cachedomains[cdn].domains.length;
+                
+                cdnElements[cdn] = cdntemplate.clone().attr('id', 'cdn' + cdn).appendTo($("#cdns"));
+                cdnElements[cdn].show();
+                
+                $(cdnElements[cdn]).find("#title").html(cdn);
+                $(cdnElements[cdn]).find("#tagline").html(cachedomains[cdn].description);
+                $(cdnElements[cdn]).find("#totalcdndomaincount").html(cachedomains[cdn].domains.length);
+                
+                var logoFallback = $(cdnElements[cdn]).find("#logo-fallback");
+                logoFallback.text(cdn.charAt(0).toUpperCase());
+                
+                $(cdnElements[cdn]).find("#logo-img").hide();
+                
+                $(cdnElements[cdn]).click(function() {
+                    displayCdnAlert($(this).find("#title").html());
+                });
+                
+                for (var domain in cachedomains[cdn].domains) {
+                    callbacks[cdn].push(checkDomain(cdn, cachedomains[cdn].domains[domain]));
+                }
+                
+                Promise.all(callbacks[cdn]).then(function(responses) {
+                    var cdnname = this.find("#title").html();
+                    var success = 0;
+                    var fail = 0;
+                    
+                    for (var x in responses) {
+                        var response = responses[x];
+                        if (response.status == 1) {
+                            success++;
+                            if (distinctCaches.indexOf(response.respondingHost) == -1) {
+                                distinctCaches.push(response.respondingHost);
+                            }
+                        } else {
+                            cachedomains[response.cdn].brokenDomains.push(response.host);
+                            fail++;
+                        }
+                    }
+                    
+                    var newstate = "status-success";
+                    var dotClass = "success";
+                    var countClass = "success";
+                    if (fail > 0) {
+                        newstate = "status-warning";
+                        dotClass = "warning";
+                        countClass = "warning";
+                    }
+                    if (success == 0) {
+                        newstate = "status-danger";
+                        dotClass = "danger";
+                        countClass = "danger";
+                    }
+                    
+                    this.find(".cdn-card").removeClass("status-loading status-success status-warning status-danger").addClass(newstate);
+                    this.find(".status-dot").removeClass("loading success warning danger").addClass(dotClass);
+                    this.find("#workingcdndomaincount").removeClass("success warning danger").addClass(countClass).html(success);
+                }.bind(cdnElements[cdn]));
+            }
+            
+            $("#domaincount").html(domaincount);
+            $("#providercount").html(providercount);
+            cdntemplate.hide();
+        });
+    </script>
 </body>
 </html>
