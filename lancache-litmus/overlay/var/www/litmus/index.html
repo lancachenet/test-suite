@@ -71,7 +71,6 @@
       .header .subtitle {
         font-size: 1.25rem;
         opacity: 0.95;
-        margin-bottom: 1.5rem;
       }
 
       .dns-info {
@@ -382,10 +381,10 @@
         color: var(--text-color);
       }
 
-      #urltext a {
-        color: var(--primary-color);
-        text-decoration: underline;
+      #urltext {
+        margin-bottom: 1.5rem;
       }
+
       #urltext a:hover {
         color: #c41611;
       }
@@ -484,6 +483,7 @@
 					We are aware of <strong id="domaincount">0</strong> domains spanning
 					<strong id="providercount">0</strong> providers.
 				</p>
+        <p id="urltext"></p>
 
 				<div class="dns-info">
 					<p style="margin-bottom: 1rem">
@@ -706,6 +706,7 @@
         }
         document.getElementById("domaincount").textContent = domaincount;
         document.getElementById("providercount").textContent = providercount;
+        document.getElementById("urltext").innerHTML = urltext
       });
     </script>
 	</body>
