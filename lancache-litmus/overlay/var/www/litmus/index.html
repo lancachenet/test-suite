@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>LanCache Host Checker</title>
-		<script src="sites.js"></script>
-		<style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LanCache Host Checker</title>
+    <script src="sites.js"></script>
+    <style>
       :root {
         --primary-color: #e91d12;
         --text-color: #fbeee9;
@@ -75,7 +75,7 @@
 
       .dns-info {
         background: rgba(233, 29, 18, 0.1);
-        padding: 1.5rem;
+        padding: 1rem;
         border-radius: 12px;
         border: 1px solid rgba(233, 29, 18, 0.2);
       }
@@ -382,7 +382,12 @@
       }
 
       #urltext {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      #urltext a {
+        color: var(--primary-color);
+        text-decoration: underline;
       }
 
       #urltext a:hover {
@@ -471,104 +476,103 @@
         }
       }
     </style>
-	</head>
-	<body>
-		<div class="container">
-			<!-- Header Section -->
-			<div class="header">
-				<img
-					src="https://lancache.net/img/lancache-fulllogo.svg"
-					alt="LanCache.Net" />
-				<p class="subtitle">
-					We are aware of <strong id="domaincount">0</strong> domains spanning
-					<strong id="providercount">0</strong> providers.
-				</p>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header Section -->
+      <div class="header">
+        <img
+          src="https://lancache.net/img/lancache-fulllogo.svg"
+          alt="LanCache.Net" />
+        <p class="subtitle">
+          We are aware of <strong id="domaincount">0</strong> domains spanning
+          <strong id="providercount">0</strong> providers.
+        </p>
         <p id="urltext"></p>
 
-				<div class="dns-info">
-					<p style="margin-bottom: 1rem">
-						During LanCache Test if you find the listed Gaming Stream sites RED
-						then your Cache Services are NOT working. Get started with LanCache
-						today!
-					</p>
+        <div class="dns-info">
+          <p>
+            During LanCache Test if you find the listed Gaming Stream sites RED
+            then your Cache Services are NOT working. Get started with LanCache
+            today!
+          </p>
 
-					<div class="button-grid">
-						<a
-							href="https://lancache.net/"
-							class="info-button"
-							target="_blank"
-							rel="noopener">
-							🚀 Learn more about Lancache
-						</a>
-					</div>
-				</div>
-				<p id="urltext"></p>
-			</div>
+          <div class="button-grid">
+            <a
+              href="https://lancache.net/"
+              class="info-button"
+              target="_blank"
+              rel="noopener">
+              🚀 Learn more about Lancache
+            </a>
+          </div>
+        </div>
+      </div>
 
-			<!-- Test Section -->
-			<div class="test-section">
-				<h2>🔍 Test Custom Domain</h2>
-				<div class="input-group">
-					<input
-						type="text"
-						id="inputTest"
-						placeholder="Enter domain to test (Wildcards valid - e.g., *.example.com)" />
-					<button id="inputTestButton" class="btn btn-primary">
-						Test Domain
-					</button>
-				</div>
-				<p id="urltext"></p>
-			</div>
+      <!-- Test Section -->
+      <div class="test-section">
+        <h2>🔍 Test Custom Domain</h2>
+        <div class="input-group">
+          <input
+            type="text"
+            id="inputTest"
+            placeholder="Enter domain to test (Wildcards valid - e.g., *.example.com)" />
+          <button id="inputTestButton" class="btn btn-primary">
+            Test Domain
+          </button>
+        </div>
+      </div>
 
-			<!-- Alert Section -->
-			<div id="cache-info" class="alert alert-warning" style="display: none">
-				<button type="button" class="close" onclick="hideAlert()">
-					&times;
-				</button>
-				<div id="cache-info-display-title"></div>
-				<div id="cache-info-display"></div>
-			</div>
+      <!-- Alert Section -->
+      <div id="cache-info" class="alert alert-warning" style="display: none">
+        <button type="button" class="close" onclick="hideAlert()">
+          &times;
+        </button>
+        <div id="cache-info-display-title"></div>
+        <div id="cache-info-display"></div>
+      </div>
 
-			<!-- Services Header -->
-			<div class="services-header">
-				<h2>🎮 Gaming & CDN Services</h2>
-				<p>
-					Live status of supported gaming platforms and content delivery
-					networks
-				</p>
-			</div>
+      <!-- Services Header -->
+      <div class="services-header">
+        <h2>🎮 Gaming & CDN Services</h2>
+        <p>
+          Live status of supported gaming platforms and content delivery
+          networks
+        </p>
+      </div>
 
-			<!-- CDN Cards Grid -->
-			<div id="cdns" class="cdn-grid"></div>
+      <!-- CDN Cards Grid -->
+      <div id="cdns" class="cdn-grid"></div>
 
-			<!-- Hidden Template -->
-			<div id="cdntemplate" style="display: none">
-				<div class="cdn-card status-loading">
-					<div class="cdn-header">
-						<div class="cdn-logo" id="logo">
-							<span id="logo-fallback">?</span>
-							<img
-								id="logo-img"
-								style="display: none"
-								onerror="this.style.display='none'; this.parentNode.querySelector('#logo-fallback').style.display='inline';" />
-						</div>
-						<div class="cdn-title" id="title">Loading...</div>
-					</div>
-					<div class="cdn-description" id="tagline">Checking domains...</div>
-					<div class="cdn-footer">
-						<div class="status-indicator">
-							<div class="status-dot loading"></div>
-							<span class="stats-text">
-								<span class="working-count" id="workingcdndomaincount">0</span>/<span
-									id="totalcdndomaincount">0</span> domains
-							</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+      <!-- Hidden Template -->
+      <div id="cdntemplate" style="display: none">
+        <div class="cdn-card status-loading">
+          <div class="cdn-header">
+            <div class="cdn-logo" id="logo">
+              <span id="logo-fallback">?</span>
+              <img
+                id="logo-img"
+                style="display: none"
+                onerror="this.style.display='none'; this.parentNode.querySelector('#logo-fallback').style.display='inline';" />
+            </div>
+            <div class="cdn-title" id="title">Loading...</div>
+          </div>
+          <div class="cdn-description" id="tagline">Checking domains...</div>
+          <div class="cdn-footer">
+            <div class="status-indicator">
+              <div class="status-dot loading"></div>
+              <span class="stats-text">
+                <span class="working-count"
+                  id="workingcdndomaincount">0</span>/<span
+                  id="totalcdndomaincount">0</span> domains
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<script>
+    <script>
       const wildcardPrefix = "lancachetest.";
       function hideAlert() {
         document.getElementById("cache-info").style.display = "none";
@@ -709,5 +713,5 @@
         document.getElementById("urltext").innerHTML = urltext
       });
     </script>
-	</body>
+  </body>
 </html>
