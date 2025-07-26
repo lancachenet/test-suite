@@ -6,7 +6,10 @@ cd /data/cachedomains
 sed -i "s/LITMUS_HOSTNAME/${LITMUS_HOSTNAME}/" /etc/nginx/sites-available/litmus.conf.d/10_litmus.conf
 export GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostCACHE_IDENTIFIERChecking=no"
 if [[ ! -d .git ]]; then
-	git clone ${CACHE_DOMAINS_REPO} .
+	git clone ${CACHE_DOMAINS_REPO} . || {
+		echo "Failed to clone ${CACHE_DOMAINS_REPO}; falling back to prebuilt sites.js" >&2;
+		exit 0;
+	}
 fi
 
 if [[ "${NOFETCH:-false}" != "true" ]]; then
@@ -14,6 +17,7 @@ if [[ "${NOFETCH:-false}" != "true" ]]; then
 	git reset --hard origin/${CACHE_DOMAINS_BRANCH}
 fi
 
+declare -i total_domains
 TEMP_PATH=$(mktemp -d)
 OUTPUTFILE=${TEMP_PATH}/outfile.js
 echo "var cachedomains = {" >> $OUTPUTFILE
@@ -43,6 +47,7 @@ jq -r '.cache_domains | to_entries[] | .key' cache_domains.json | while read CAC
 		echo "		]" >> $OUTPUTFILE
 		echo "	}," >> $OUTPUTFILE
 	done
+	total_domains+=1
 done
 echo "};" >> $OUTPUTFILE
 if [[ -d .git ]]; then
@@ -55,5 +60,12 @@ else
 	echo "var urltext='Running with an external hostlist that is not git controlled (Generated at ${date})';" >> $OUTPUTFILE;
 fi
 cat $OUTPUTFILE
+
+if [ $total_domains -eq 0 ]
+then
+	echo "Found no cache domains; falling back to prebuilt sites.js" >&2
+	exit 0
+fi
+
 cp $OUTPUTFILE /var/www/litmus/sites.js
 rm -rf $TEMP_PATH
