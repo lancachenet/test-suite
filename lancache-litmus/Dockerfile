@@ -1,27 +1,37 @@
+# hadolint ignore=DL3007
 FROM lancachenet/ubuntu-nginx:latest
-MAINTAINER LanCache.Net Team <team@lancache.net>
 
-ENV WEBUSER www-data
-ENV LITMUS_HOSTNAME lancache.lan
-ENV CACHE_DOMAINS_REPO https://github.com/uklans/cache-domains.git
-ENV CACHE_DOMAINS_BRANCH master
-ENV NGINX_WORKER_PROCESSES 16
+LABEL org.opencontainers.image.authors="LanCache.Net Team <team@lancache.net>"
 
-RUN apt-get update            ;\
-    apt-get install -y jq git
+SHELL ["/bin/bash", "-c"]
 
-COPY overlay/ /
+ENV \
+WEBUSER=www-data \
+LITMUS_HOSTNAME=lancache.lan \
+CACHE_DOMAINS_REPO=https://github.com/uklans/cache-domains.git \
+CACHE_DOMAINS_BRANCH=master \
+NGINX_WORKER_PROCESSES=16
 
-RUN rm /etc/nginx/sites-enabled/*                                           ;\
-    rm /etc/nginx/conf.d/gzip.conf /etc/nginx/conf.d/openshift_logging.conf ;\
-    chmod 754  /var/log/tallylog                                            ;\
-    id -u ${WEBUSER} &> /dev/null || adduser --system --home /var/www/ --no-create-home --shell /bin/false --group --disabled-login ${WEBUSER} ;\
-    chown -R ${WEBUSER}:${WEBUSER} /var/www/                                ;\
-    mkdir -p /etc/nginx/sites-enabled	                                    ;\
-    ln -s /etc/nginx/sites-available/10_litmus.conf /etc/nginx/sites-enabled/10_litmus.conf
+# hadolint ignore=DL3008
+RUN <<EOF
+  apt-get update
+  apt-get install -y ca-certificates git jq --no-install-recommends
+  apt-get -y clean
+  rm -rf /var/lib/apt/lists/*
+EOF
+
+COPY --link overlay/ /
+
+RUN <<EOF
+  id -u ${WEBUSER} &> /dev/null || adduser --system --home /var/www/ --no-create-home --shell /bin/false --group --disabled-login ${WEBUSER}
+  mkdir -p /etc/nginx/sites-enabled
+  rm /etc/nginx/sites-enabled/* /etc/nginx/conf.d/{gzip,openshift_logging}.conf
+  chown -R ${WEBUSER}: /var/www/
+  chmod 754  /var/log/tallylog
+  file=sites-available/10_litmus.conf
+  ln -s "/etc/nginx/${file}" "/etc/nginx/${file/available/enabled}"
+EOF
 
 VOLUME ["/var/www/litmus"]
-
 EXPOSE 80
-
 WORKDIR /scripts
